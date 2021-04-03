@@ -5,6 +5,7 @@ body {
 
 .square {
     background: #fff;
+    color: #fff;
     border: 1px solid #999;
     float: left;
     font-size: 24px;
@@ -25,7 +26,7 @@ body {
   }
 
 form {
-	border: thin solid #888;
+  border: thin solid #888;
   padding: 2rem;
   margin-bottom: 2rem;
   display: flex;

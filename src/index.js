@@ -2,32 +2,33 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-const Square = () => {
+const Square = (props) => {
     const [row, setRow] = useState('');
     const [col, setCol] = useState('');
-    const [bom, setBom] = useState('');
+    const [bomb, setBom] = useState('');
     const lines = rangeArray(0, row);
     const columns = rangeArray(0, col);
-    let board = rangeArray(0,col * row);
-    let copyBom = bom;
+    let boomFree = 0;
+    
+    let board = rangeArray(0, col * row);
+    let copyBom = bomb;
     for (let i = 0; i < board.length; i++) {
-        if(copyBom) {
+        if (copyBom) {
             board[i] = '*';
             --copyBom;
         }
         else {
             board[i] = 0;
         }
-
     };
 
     board = shuffleArray(board).slice();
     let bidimensionalArray = new Array(row && col ? row : 100);
-    for (let i = 0; i < row; i++){
-        bidimensionalArray[i] = new Array(col && row ? col : 100);
+    for (let i = 0; i < row; i++) {
+        bidimensionalArray[i] = new Array(col && row ? col: 100);
     }
 
-    if(row && col) {
+    if (row && col) {
         let k = 0;
         for (let i = 0; i < row; i++) {
             for (let j = 0; j < col; j++) {
@@ -37,64 +38,107 @@ const Square = () => {
         }
         for (let i = 0; i < row; i++) {
             for (let j = 0; j < col; j++) {
-                if(!bidimensionalArray[i][j]) {
+                if (!bidimensionalArray[i][j]) {
                     let numberOfBombs = 0;
-                    if(i > 0 && j > 0 && bidimensionalArray[i-1][j-1] === "*") {
+                    if (i > 0 && j > 0 && bidimensionalArray[i - 1][j - 1] === "*") {
                         ++numberOfBombs;
                     }
-                    if(i > 0 && bidimensionalArray[i-1][j] === "*") {
+                    if (i > 0 && bidimensionalArray[i - 1][j] === "*") {
                         ++numberOfBombs;
                     }
-                    if(i > 0 && j + 1 < col && bidimensionalArray[i-1][j+1] === "*") {
+                    if (i > 0 && j + 1 < col && bidimensionalArray[i - 1][j + 1] === "*") {
                         ++numberOfBombs;
                     }
-                    if(j > 0 && bidimensionalArray[i][j-1] === "*") {
+                    if (j > 0 && bidimensionalArray[i][j - 1] === "*") {
                         ++numberOfBombs;
                     }
-                    if(j + 1 < col && bidimensionalArray[i][j+1] === "*") {
+                    if (j + 1 < col && bidimensionalArray[i][j + 1] === "*") {
                         ++numberOfBombs;
                     }
-                    if(i + 1 < row && j > 0 && bidimensionalArray[i+1][j-1] === "*") {
+                    if (i + 1 < row && j > 0 && bidimensionalArray[i + 1][j - 1] === "*") {
                         ++numberOfBombs;
                     }
-                    if(i + 1 < row && bidimensionalArray[i+1][j] === "*") {
+                    if (i + 1 < row && bidimensionalArray[i + 1][j] === "*") {
                         ++numberOfBombs;
                     }
-                    if(i + 1 < row && j + 1 < col && bidimensionalArray[i+1][j+1] === "*") {
+                    if (i + 1 < row && j + 1 < col && bidimensionalArray[i + 1][j + 1] === "*") {
                         ++numberOfBombs;
                     }
                     bidimensionalArray[i][j] = numberOfBombs;
                 }
-                
+
             }
         }
     }
+   
+    function displayBoard(e) {
+        e.preventDefault();
+        setRow(document.getElementById("1").value);
+        setCol(document.getElementById("2").value);
+        setBom(document.getElementById("3").value);
+    }
+
+    function isZero(id) {
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                let newId = "#" + (parseInt(id[1]) + i) + (parseInt(id[2]) + j);
+                if(document.getElementById(newId) && document.getElementById(newId).style.color !== "black") {
+                    document.getElementById(newId).style.color = "black";
+                    ++boomFree;
+                    if(document.getElementById(newId).value === "0") {
+                        isZero(newId);
+                    }
+                    
+                    
+                }
+            }
+        }
+    }
+
+    function sowValue(e) {
+        e.preventDefault();
+        let id = e.target.id;
+        if (e.target.value === "0") {
+            isZero(id);
+        }
+        if(e.target.value === "*") {
+            alert("Game Over");
+        }
+        if(e.target.style.color !== 'black') {
+            ++boomFree;
+        }
+        e.target.style.color = 'black';
+        if(boomFree === col * row - bomb) {
+            alert("Winner!")
+        }
+    }
+    
     return (
         <div>
-        <form>
-        <input type="number" placeholder="row nr." onInput={e => setRow(e.target.value)}/>
-        <input type="number" placeholder="col nr." onInput={e => setCol(e.target.value)}/>
-        <input type="number" placeholder="bom nr." onInput={e => setBom(e.target.value)}/>
-        <button>Play</button>
-        </form>
-        <div>
-        {
-            lines.map(line => {
-                return <div key={line} className="board-row">
+            <form onSubmit={displayBoard}>
+                <input type="number" placeholder="row nr." id="1" />
+                <input type="number" placeholder="col nr." id="2" />
+                <input type="number" placeholder="bom nr." id="3" />
+                <button>Play</button>
+                <button onClick={() => window.location.reload()}>Reset Game</button>
+            </form>
+            <div>
                 {
-                    columns.map(col => {
-                        return <button key={col} className='square'>{bidimensionalArray[line][col]}</button>
+                    lines.map(line => {
+                        return <div key={line} className="board-row">
+                            {
+                                columns.map(col => {
+                                    return <input key={col} className='square' id={"#" + line + col} onClick={sowValue} value={bidimensionalArray[line][col]} readOnly />
+                                })
+                            }
+                        </div>
                     })
+
                 }
-                </div>
-            })
-        } 
-        </div>
+            </div>
         </div>
     )
 }
-
-
 
 ReactDOM.render(
     <div>
@@ -104,9 +148,6 @@ ReactDOM.render(
     document.getElementById('root'),
 );
 
-
-
-//utils
 function rangeArray(start, end) {
     const line = [];
     for (let i = start; i < end; i++) {
@@ -116,13 +157,12 @@ function rangeArray(start, end) {
 }
 
 function shuffleArray(array) {
-    for (var i = array.length - 1; i > 0; i--) { 
+    for (var i = array.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
-                     
+
         var temp = array[i];
         array[i] = array[j];
         array[j] = temp;
     }
-         
     return array;
- }
+}
