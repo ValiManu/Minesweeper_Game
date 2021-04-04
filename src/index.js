@@ -5,10 +5,10 @@ import './index.css';
 const Square = (props) => {
     const [row, setRow] = useState('');
     const [col, setCol] = useState('');
-    const [bomb, setBom] = useState('');
+    const [bomb, setBomb] = useState('');
     const lines = rangeArray(0, row);
     const columns = rangeArray(0, col);
-    let boomFree = 0;
+    let bombFree = 0;
     
     let board = rangeArray(0, col * row);
     let copyBom = bomb;
@@ -75,7 +75,7 @@ const Square = (props) => {
         e.preventDefault();
         setRow(document.getElementById("1").value);
         setCol(document.getElementById("2").value);
-        setBom(document.getElementById("3").value);
+        setBomb(document.getElementById("3").value);
     }
 
     function isZero(id) {
@@ -84,12 +84,10 @@ const Square = (props) => {
                 let newId = "#" + (parseInt(id[1]) + i) + (parseInt(id[2]) + j);
                 if(document.getElementById(newId) && document.getElementById(newId).style.color !== "black") {
                     document.getElementById(newId).style.color = "black";
-                    ++boomFree;
+                    ++bombFree;
                     if(document.getElementById(newId).value === "0") {
                         isZero(newId);
                     }
-                    
-                    
                 }
             }
         }
@@ -105,10 +103,10 @@ const Square = (props) => {
             alert("Game Over");
         }
         if(e.target.style.color !== 'black') {
-            ++boomFree;
+            ++bombFree;
         }
         e.target.style.color = 'black';
-        if(boomFree === col * row - bomb) {
+        if(bombFree === col * row - bomb) {
             alert("Winner!")
         }
     }
@@ -118,7 +116,7 @@ const Square = (props) => {
             <form onSubmit={displayBoard}>
                 <input type="number" placeholder="row nr." id="1" />
                 <input type="number" placeholder="col nr." id="2" />
-                <input type="number" placeholder="bom nr." id="3" />
+                <input type="number" placeholder="bomb nr." id="3" />
                 <button>Play</button>
                 <button onClick={() => window.location.reload()}>Reset Game</button>
             </form>
